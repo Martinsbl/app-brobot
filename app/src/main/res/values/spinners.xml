@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pqm_frequency_array">
+        <item>@string/pwm_freq_19_7khz</item>
+        <item>@string/pwm_freq_2_5khz</item>
+        <item>@string/pwm_freq_310hz</item>
+    </string-array>
+</resources>

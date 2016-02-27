@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">"BrobotGui"</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_configs">Configure</string>
+    <string name="brobot">Brobot</string>
+
+    <string name="pwm_freq_19_7khz">19.7 kHz</string>
+    <string name="pwm_freq_2_5khz">2.5 kHz</string>
+    <string name="pwm_freq_310hz">310 Hz</string>
+</resources>
