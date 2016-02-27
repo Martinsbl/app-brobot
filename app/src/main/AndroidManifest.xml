@@ -20,15 +20,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".SetupActivity"
-            android:label="@string/action_settings"
-            android:parentActivityName="com.example.martin.brobotgui.MainActivity">
-            <intent-filer>
-                <action android:name="com.example.martin.brobotgui.SETUPACTIVITY" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filer>
-        </activity>
     </application>
 
 </manifest>

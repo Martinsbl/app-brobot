@@ -1,7 +1,11 @@
 package com.example.martin.brobotgui;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,26 +14,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-public class MainActivity extends Activity implements View.OnClickListener{
+public class MainActivity extends Activity{
 
     public final String LOG_TAG = "Brobot";
-    Button btnConnect;
-    Button btnDisconnect;
-    Button btnTest1;
-    Button btnTest2;
-    ImageView imgBrobot;
     BluetoothModel model;
     Brobot brobot;
+    FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createGui();
         setBrobot();
         setModel();
-        model.bluetoothCommunicationHandler.startCommunication();
+        initFragment();
     }
 
     public Brobot getBrobot() {
@@ -49,60 +48,64 @@ public class MainActivity extends Activity implements View.OnClickListener{
         model.bluetoothCommunicationHandler = new BluetoothCommunicationHandler(this);
     }
 
-
-    private void createGui() {
-        btnConnect = (Button) findViewById(R.id.btn_connect);
-        btnConnect.setOnClickListener(this);
-        btnDisconnect = (Button) findViewById(R.id.btn_disconnect);
-        btnDisconnect.setOnClickListener(this);
-        imgBrobot = (ImageView) findViewById(R.id.img_brobot);
-
-        btnTest1 = (Button) findViewById(R.id.btn_test1);
-        btnTest1.setOnClickListener(this);
-        btnTest2 = (Button) findViewById(R.id.btn_test2);
-        btnTest2.setOnClickListener(this);
-    }
-
     public void connectMainActivity() {
-        btnConnect.setEnabled(false);
-        btnDisconnect.setEnabled(true);
-        imgBrobot.setImageResource(R.drawable.brobot_red);
+        Fragment fragment = fragmentManager.findFragmentByTag("MAINFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((MainFragment) fragment).setBrobotLayoutValuesWhenConnected();
+        }
     }
 
     public void disconnectMainActivity() {
-        btnConnect.setEnabled(true);
-        btnDisconnect.setEnabled(false);
-        imgBrobot.setImageResource(R.drawable.brobot_gray);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_connect:
-                model.bluetoothScanner.ScanForDevices();
-                break;
-            case R.id.btn_disconnect:
-                model.bluetoothCommunicationHandler.bluetoothDisconnect();
-                disconnectMainActivity();
-                break;
-            case R.id.btn_test1:
-                brobot.qikMotorControl.setSpeed(50, 50);
-                model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
-                break;
-            case R.id.btn_test2:
-                brobot.qikMotorControl.setSpeed(0, 0);
-                model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
-                break;
-            default:
-                break;
+        Fragment fragment = fragmentManager.findFragmentByTag("MAINFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((MainFragment) fragment).setBrobotLayoutValuesWhenDisconnected();
         }
     }
+
+    public void setSignalStrengthIconMainActivity() {
+        Fragment fragment = fragmentManager.findFragmentByTag("MAINFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((MainFragment) fragment).setSignalStrengthIcon();
+        }
+    }
+
+
+    public void initFragment() {
+        fragmentManager = getFragmentManager();
+        changeFragment(new MainFragment(), "MAINFRAGMENT");
+
+    }
+
+    public void changeFragment(Fragment fragment, String tag){
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment, tag);
+        transaction.addToBackStack(tag);
+        transaction.commit();
+    }
+
+    public void updateSetupFragment() {
+        Fragment fragment = fragmentManager.findFragmentByTag("SETUPFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((SetupFragment) fragment).updateQikConfigGuiValues();
+        }
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    private boolean checkIfSetupFragmentIdVisible() {
+        Fragment fragment = fragmentManager.findFragmentByTag("SETUPFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -114,9 +117,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent openSettings = new Intent(this, SetupActivity.class);
-            startActivity(openSettings);
-            return true;
+            if (  !checkIfSetupFragmentIdVisible()) {
+                changeFragment(new SetupFragment(), "SETUPFRAGMENT");
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);

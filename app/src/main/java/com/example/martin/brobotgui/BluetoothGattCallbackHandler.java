@@ -141,12 +141,12 @@ public class BluetoothGattCallbackHandler {
                 if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_CONFIG_CHAR)) {
 //                    model.qikConfig.setQikConfig(characteristic.getValue());
                     brobot.qikMotorControl.setConfig(characteristic.getValue());
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            activity.updateQikConfigGuiValues();
-//                        }
-//                    });
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.updateSetupFragment();
+                        }
+                    });
                 }else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_MEASUREMENTS_CHAR)) {
 //                    model.qikConfig.setQikMeasurements(characteristic.getValue());
                     brobot.qikMotorControl.setMeasurements(characteristic.getValue());
@@ -157,6 +157,7 @@ public class BluetoothGattCallbackHandler {
 //                        }
 //                    });
                 }
+                model.bluetoothGatt.readRemoteRssi();
             }
 
             @Override
@@ -204,6 +205,14 @@ public class BluetoothGattCallbackHandler {
             @Override
             public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
                 super.onReadRemoteRssi(gatt, rssi, status);
+                model.rssi = rssi;
+                Log.i(activity.LOG_TAG, "onReadRemoteRssi");
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.setSignalStrengthIconMainActivity();
+                    }
+                });
             }
         };
     }

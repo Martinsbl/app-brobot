@@ -155,7 +155,7 @@ public class QikMotorControl {
     }
 
     public void setDefaultValues() {
-        byte[] defaultValues = {10, 0, 7, 0, 0, 0, 0, 0, 0, 0, 4, 4};
+        byte[] defaultValues = {10, 0, 6, 0, 0, 0, 0, 0, 0, 0, 4, 4};
         setConfig(defaultValues);
     }
 }
