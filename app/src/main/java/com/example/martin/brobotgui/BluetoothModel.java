@@ -29,6 +29,9 @@ public class BluetoothModel {
     BluetoothGattCharacteristic qikSpeedCharacteristic;
     BluetoothGattCharacteristic qikMeasurementsCharacteristic;
 
+    BluetoothGattService brobotBatteryService;
+    BluetoothGattCharacteristic brobotBatteryCharacteristic;
+
     int rssi;
 
     public static final UUID BLE_UUID_CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
@@ -39,6 +42,9 @@ public class BluetoothModel {
     public static final UUID BLE_UUID_QIK_MOTOR_SERVICE = UUID.fromString ("0000E1CE-1212-efde-1523-785fef13d123");
     public static final UUID BLE_UUID_QIK_SPEED_CHAR = UUID.fromString("00005EED-1212-efde-1523-785fef13d123");
     public static final UUID BLE_UUID_QIK_MEASUREMENTS_CHAR = UUID.fromString("0000EA5E-1212-efde-1523-785fef13d123");
+
+    public static final UUID BLE_UUID_BATTERY_SERVICE = UUID.fromString ("0000180F-0000-1000-8000-00805f9b34fb");
+    public static final UUID BLE_UUID_BATTERY_CHAR = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
 
     public static final String DESIRED_DEVICE_NAME = "Brobot";
 }

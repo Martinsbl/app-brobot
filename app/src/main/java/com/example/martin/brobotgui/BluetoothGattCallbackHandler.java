@@ -21,7 +21,9 @@ public class BluetoothGattCallbackHandler {
         STATE_CONNECTED,
         STATE_SERVICE_DISCOVERY,
         STATE_ENABLE_CCCD_MEASUREMENTS,
+        STATE_ENABLE_CCCD_BATTERY,
         STATE_READ_INITIAL_CONFIG_CHAR,
+        STATE_READ_INITIAL_BATTERY_CHAR,
         STATE_CONNECTION_FINNISHED
     }
     private ConnectionStateMachine connectionState = ConnectionStateMachine.STATE_DISCONNECTED;
@@ -59,7 +61,10 @@ public class BluetoothGattCallbackHandler {
                     model.bluetoothCommunicationHandler.bluetoothDisconnect();
 
                     connectionState = ConnectionStateMachine.STATE_DISCONNECTED;
+                } else if (newState == BluetoothGatt.STATE_DISCONNECTING) {
+                    Log.i(activity.LOG_TAG, "DisconnectING");
                 }
+
             }
 
             @Override
@@ -73,6 +78,8 @@ public class BluetoothGattCallbackHandler {
                         model.qikConfigService = gatt.getServices().get(i);
                     } else if (BluetoothModel.BLE_UUID_QIK_MOTOR_SERVICE.equals(gatt.getServices().get(i).getUuid())) {
                         model.qikMotorService = gatt.getServices().get(i);
+                    } else if (BluetoothModel.BLE_UUID_BATTERY_SERVICE.equals(gatt.getServices().get(i).getUuid())) {
+                        model.brobotBatteryService = gatt.getServices().get(i);
                     }
 
                 }
@@ -108,6 +115,15 @@ public class BluetoothGattCallbackHandler {
                         }
                     }
                 }
+                if (model.brobotBatteryService != null) {
+                    int j;
+                    for (j = 0; j < model.brobotBatteryService.getCharacteristics().size(); j++) {
+                        if (BluetoothModel.BLE_UUID_BATTERY_CHAR.equals(model.brobotBatteryService.getCharacteristics().get(j).getUuid())) {
+                            model.brobotBatteryCharacteristic = model.brobotBatteryService.getCharacteristics().get(j);
+                            Log.i(activity.LOG_TAG, "Battery Characteristic found.");
+                        }
+                    }
+                }
 
                 connectionState = ConnectionStateMachine.STATE_ENABLE_CCCD_MEASUREMENTS;
             }
@@ -116,9 +132,7 @@ public class BluetoothGattCallbackHandler {
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicRead(gatt, characteristic, status);
                 if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_CONFIG_CHAR)) {
-//                    model.qikConfig.setQikConfig(characteristic.getValue());
                     brobot.qikMotorControl.setConfig(characteristic.getValue());
-//                    Log.i(activity.LOG_TAG, "QikConfig: " + model.qikConfig.getDeviceIdValue());
                     Log.i(activity.LOG_TAG, "QikConfig: " + brobot.qikMotorControl.getDeviceIdValue());
 //                    activity.runOnUiThread(new Runnable() {
 //                        @Override
@@ -126,6 +140,15 @@ public class BluetoothGattCallbackHandler {
 //                            activity.updateQikConfigGuiValues();
 //                        }
 //                    });
+                    model.bluetoothCommunicationHandler.readBatteryCharacteristic(); // DETTE BØR GJØRES PÅ EN ANNEN MÅTE!
+                } else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_BATTERY_CHAR)) {
+                    brobot.batteryLevel = (characteristic.getValue()[1] << 8 ) + (characteristic.getValue()[0]);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.setBatteryVoltageMainActivity();
+                        }
+                    });
                 }
             }
 
@@ -137,9 +160,7 @@ public class BluetoothGattCallbackHandler {
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
-                //Log.i(activity.LOG_TAG, "onCharacteristicChanged:");
                 if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_CONFIG_CHAR)) {
-//                    model.qikConfig.setQikConfig(characteristic.getValue());
                     brobot.qikMotorControl.setConfig(characteristic.getValue());
                     activity.runOnUiThread(new Runnable() {
                         @Override
@@ -148,7 +169,6 @@ public class BluetoothGattCallbackHandler {
                         }
                     });
                 }else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_MEASUREMENTS_CHAR)) {
-//                    model.qikConfig.setQikMeasurements(characteristic.getValue());
                     brobot.qikMotorControl.setMeasurements(characteristic.getValue());
 //                    activity.runOnUiThread(new Runnable() {
 //                        @Override
@@ -156,6 +176,14 @@ public class BluetoothGattCallbackHandler {
 //                            activity.updateQikMeasurementsGuiValues();
 //                        }
 //                    });
+                }else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_BATTERY_CHAR)) {
+                    brobot.batteryLevel = (characteristic.getValue()[1] << 8 ) + (characteristic.getValue()[0]);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.setBatteryVoltageMainActivity();
+                        }
+                    });
                 }
                 model.bluetoothGatt.readRemoteRssi();
             }
@@ -179,6 +207,17 @@ public class BluetoothGattCallbackHandler {
                             } else
                                 Log.i(activity.LOG_TAG, "Measurements CCCD failed to enable.");
                         }
+                        connectionState = ConnectionStateMachine.STATE_ENABLE_CCCD_BATTERY;
+                        return;
+                    case STATE_ENABLE_CCCD_BATTERY:
+                        if (model.bluetoothGatt.setCharacteristicNotification(model.brobotBatteryCharacteristic, true)) {
+                            BluetoothGattDescriptor cccdDescriptor = model.brobotBatteryCharacteristic.getDescriptor(BluetoothModel.BLE_UUID_CCCD);
+                            cccdDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            if (model.bluetoothGatt.writeDescriptor(cccdDescriptor)) {
+                                Log.i(activity.LOG_TAG, "Battery CCCD enabled.");
+                            } else
+                                Log.i(activity.LOG_TAG, "Battery CCCD failed to enable.");
+                        }
                         connectionState = ConnectionStateMachine.STATE_READ_INITIAL_CONFIG_CHAR;
                         return;
                     case STATE_READ_INITIAL_CONFIG_CHAR:
@@ -191,10 +230,6 @@ public class BluetoothGattCallbackHandler {
                     default:
                         break;
                 }
-
-                //if(model.qikMeasurementsCharacteristic.getDescriptor(model.BLE_UUID_CCCD).getValue() =
-                //Log.i(activity.LOG_TAG, "Value: " + Byte.toString(model.qikMeasurementsCharacteristic. getDescriptor(BluetoothModel.BLE_UUID_CCCD).getValue()[0]) + ", " + Byte.toString(model.qikMeasurementsCharacteristic.getDescriptor(BluetoothModel.BLE_UUID_CCCD).getValue()[1]));
-
             }
 
             @Override
@@ -206,7 +241,6 @@ public class BluetoothGattCallbackHandler {
             public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
                 super.onReadRemoteRssi(gatt, rssi, status);
                 model.rssi = rssi;
-                Log.i(activity.LOG_TAG, "onReadRemoteRssi");
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -69,6 +69,13 @@ public class MainActivity extends Activity{
         }
     }
 
+    public void setBatteryVoltageMainActivity() {
+        Fragment fragment = fragmentManager.findFragmentByTag("MAINFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((MainFragment) fragment).setBatteryIcon();
+        }
+    }
+
 
     public void initFragment() {
         fragmentManager = getFragmentManager();

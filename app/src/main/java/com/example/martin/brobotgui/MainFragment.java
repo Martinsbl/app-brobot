@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 /**
  * Created by Martin on 27.02.2016.
  */
@@ -27,6 +29,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     MainActivity activity;
     ImageView imgRssi;
     TextView txtRssi;
+    ImageView imgBatteryLevel;
+    TextView txtBatteryLevel;
+    TextView txtBatteryVoltage;
 
 
     @Override
@@ -59,6 +64,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         imgRssi = (ImageView) view.findViewById(R.id.img_rssi);
         imgRssi.setImageResource(R.drawable.ic_signal_wifi_off_24dp);
         txtRssi = (TextView) view.findViewById(R.id.txt_rssi);
+
+        imgBatteryLevel = (ImageView) view.findViewById(R.id.img_battery_level);
+        imgRssi.setImageResource(R.drawable.ic_battery_unknown_24dp);
+        txtBatteryLevel = (TextView) view.findViewById(R.id.txt_battery_level);
+        txtBatteryVoltage = (TextView) view.findViewById(R.id.txt_battery_voltage);
     }
 
     public void setSignalStrengthIcon() {
@@ -96,6 +106,44 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         txtRssi.setText(model.rssi + " dBm");
     }
 
+    public void setBatteryIcon() {
+        double battery_voltage = ((double)brobot.batteryLevel / 1024) * 1.2 * 3 *(Brobot.BATTERY_RESISTOR_HIGH + Brobot.BATTERY_RESISTOR_LOW) / Brobot.BATTERY_RESISTOR_LOW;
+        double maxBatteryLevel = 7.6;
+        double minBatteryLevel = 6.8;
+        double span = maxBatteryLevel - minBatteryLevel;
+
+
+        if (battery_voltage > maxBatteryLevel) {
+            battery_voltage = maxBatteryLevel;
+        }else if (battery_voltage < minBatteryLevel) {
+            battery_voltage = minBatteryLevel;
+        }
+
+        int batteryPercentage = (int) (100 * ((battery_voltage - minBatteryLevel) / span));
+
+        if ((batteryPercentage < 20)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_empty_24dp);
+        }else if ((batteryPercentage >= 20) && (batteryPercentage < 30)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_20_24dp);
+        }else if ((batteryPercentage >= 30) && (batteryPercentage < 50)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_30_24dp);
+        }else if ((batteryPercentage >= 50) && (batteryPercentage < 60)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_50_24dp);
+        }else if ((batteryPercentage >= 60) && (batteryPercentage < 80)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_60_24dp);
+        }else if ((batteryPercentage >= 80) && (batteryPercentage < 90)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_80_24dp);
+        }else if ((batteryPercentage >= 90) && (batteryPercentage < 95)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_90_24dp);
+        }else if ((batteryPercentage >= 95) && (batteryPercentage <= 100)) {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_full_24dp);
+        }else {
+            imgBatteryLevel.setImageResource(R.drawable.ic_battery_unknown_24dp);
+        }
+        txtBatteryLevel.setText(batteryPercentage + " %");
+        txtBatteryVoltage.setText(String.format("%.2fV", battery_voltage));
+    }
+
     public void setBrobotLayoutValuesWhenConnected() {
         btnConnect.setEnabled(false);
         btnDisconnect.setEnabled(true);
@@ -103,6 +151,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         model.bluetoothGatt.readRemoteRssi();
         setSignalStrengthIcon();
         imgRssi.setImageAlpha(0xFF);
+        setBatteryIcon();
+        imgBatteryLevel.setImageAlpha(0xFF);
     }
 
     public void setBrobotLayoutValuesWhenDisconnected() {
@@ -112,7 +162,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         setSignalStrengthIcon();
         imgRssi.setImageResource(R.drawable.ic_signal_wifi_off_24dp);
         imgRssi.setImageAlpha(0x55);
-        txtRssi.setText(" ");
+        txtRssi.setText("--");
+        imgBatteryLevel.setImageResource(R.drawable.ic_battery_unknown_24dp);
+        imgBatteryLevel.setImageAlpha(0x55);
+        txtBatteryVoltage.setText("--");
+        txtBatteryLevel.setText("--");
     }
 
     @Override

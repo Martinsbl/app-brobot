@@ -3,6 +3,8 @@ package com.example.martin.brobotgui;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +44,13 @@ public class BluetoothCommunicationHandler {
         model.bluetoothGatt.disconnect();
         model.bluetoothGatt.close();
         model.bluetoothCurrentDevice = null;
+        model.qikConfigService = null;
+        model.qikConfigCharacteristic = null;
+        model.qikMotorService = null;
+        model.qikSpeedCharacteristic = null;
+        model.qikMeasurementsCharacteristic = null;
+        model.brobotBatteryService = null;
+        model.brobotBatteryCharacteristic = null;
     }
 
 
@@ -51,6 +60,12 @@ public class BluetoothCommunicationHandler {
             Log.i(activity.LOG_TAG, "Reading Qik configs.");
         } else {
             Log.i(activity.LOG_TAG, "Tried to read un initiated characteristic.");
+        }
+    }
+
+    public void readBatteryCharacteristic() {
+        if (model.brobotBatteryCharacteristic != null) {
+            model.bluetoothGatt.readCharacteristic(model.brobotBatteryCharacteristic);
         }
     }
 
