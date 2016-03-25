@@ -43,11 +43,9 @@ public class BluetoothGattCallbackHandler {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(activity, "Connected to " + gatt.getDevice().getName(), Toast.LENGTH_SHORT).show();
                             activity.connectMainActivity();
                         }
                     });
-                    Log.i(activity.LOG_TAG, "Connected to " + gatt.getDevice().getName());
                     model.bluetoothGatt.discoverServices();
                     connectionState = ConnectionStateMachine.STATE_CONNECTED;
                 } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
@@ -59,7 +57,6 @@ public class BluetoothGattCallbackHandler {
                         }
                     });
                     model.bluetoothCommunicationHandler.bluetoothDisconnect();
-
                     connectionState = ConnectionStateMachine.STATE_DISCONNECTED;
                 } else if (newState == BluetoothGatt.STATE_DISCONNECTING) {
                     Log.i(activity.LOG_TAG, "DisconnectING");
@@ -92,13 +89,8 @@ public class BluetoothGattCallbackHandler {
                             if (model.bluetoothGatt.setCharacteristicNotification(model.qikConfigCharacteristic, true)) {
                                 BluetoothGattDescriptor cccdDescriptor = model.qikConfigCharacteristic.getDescriptor(BluetoothModel.BLE_UUID_CCCD);
                                 cccdDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                                if (model.bluetoothGatt.writeDescriptor(cccdDescriptor)) {
-                                    Log.i(activity.LOG_TAG, "CCCD enabled.");
-                                } else
-                                    Log.i(activity.LOG_TAG, "CCCD failed to enable.");
+                                model.bluetoothGatt.writeDescriptor(cccdDescriptor);
                             }
-                            //activity.setBrobot();
-                            //activity.brobot = new Brobot();
                             brobot.qikMotorControl = new QikMotorControl(activity);
                         }
                     }
@@ -108,9 +100,7 @@ public class BluetoothGattCallbackHandler {
                     for (j = 0; j < model.qikMotorService.getCharacteristics().size(); j++) {
                         if (BluetoothModel.BLE_UUID_QIK_SPEED_CHAR.equals(model.qikMotorService.getCharacteristics().get(j).getUuid())) {
                             model.qikSpeedCharacteristic = model.qikMotorService.getCharacteristics().get(j);
-                            Log.i(activity.LOG_TAG, "Characteristic found.");
                         } else if (BluetoothModel.BLE_UUID_QIK_MEASUREMENTS_CHAR.equals(model.qikMotorService.getCharacteristics().get(j).getUuid())) {
-                            Log.i(activity.LOG_TAG, "BLE_UUID_QIK_MEASUREMENTS_CHAR found.");
                             model.qikMeasurementsCharacteristic = model.qikMotorService.getCharacteristics().get(j);
                         }
                     }
@@ -120,7 +110,6 @@ public class BluetoothGattCallbackHandler {
                     for (j = 0; j < model.brobotBatteryService.getCharacteristics().size(); j++) {
                         if (BluetoothModel.BLE_UUID_BATTERY_CHAR.equals(model.brobotBatteryService.getCharacteristics().get(j).getUuid())) {
                             model.brobotBatteryCharacteristic = model.brobotBatteryService.getCharacteristics().get(j);
-                            Log.i(activity.LOG_TAG, "Battery Characteristic found.");
                         }
                     }
                 }
@@ -133,13 +122,12 @@ public class BluetoothGattCallbackHandler {
                 super.onCharacteristicRead(gatt, characteristic, status);
                 if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_CONFIG_CHAR)) {
                     brobot.qikMotorControl.setConfig(characteristic.getValue());
-                    Log.i(activity.LOG_TAG, "QikConfig: " + brobot.qikMotorControl.getDeviceIdValue());
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            activity.updateQikConfigGuiValues();
-//                        }
-//                    });
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.updateSetupFragment();
+                        }
+                    });
                     model.bluetoothCommunicationHandler.readBatteryCharacteristic(); // DETTE BØR GJØRES PÅ EN ANNEN MÅTE!
                 } else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_BATTERY_CHAR)) {
                     brobot.batteryLevel = (characteristic.getValue()[1] << 8 ) + (characteristic.getValue()[0]);
@@ -158,7 +146,7 @@ public class BluetoothGattCallbackHandler {
             }
 
             @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
                 if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_CONFIG_CHAR)) {
                     brobot.qikMotorControl.setConfig(characteristic.getValue());
@@ -170,12 +158,12 @@ public class BluetoothGattCallbackHandler {
                     });
                 }else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_QIK_MEASUREMENTS_CHAR)) {
                     brobot.qikMotorControl.setMeasurements(characteristic.getValue());
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            activity.updateQikMeasurementsGuiValues();
-//                        }
-//                    });
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.setCurrentGauge(characteristic.getValue());
+                        }
+                    });
                 }else if (characteristic.getUuid().equals(BluetoothModel.BLE_UUID_BATTERY_CHAR)) {
                     brobot.batteryLevel = (characteristic.getValue()[1] << 8 ) + (characteristic.getValue()[0]);
                     activity.runOnUiThread(new Runnable() {
@@ -185,7 +173,7 @@ public class BluetoothGattCallbackHandler {
                         }
                     });
                 }
-                model.bluetoothGatt.readRemoteRssi();
+                //model.bluetoothGatt.readRemoteRssi();
             }
 
             @Override
@@ -196,16 +184,12 @@ public class BluetoothGattCallbackHandler {
             @Override
             public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
                 super.onDescriptorWrite(gatt, descriptor, status);
-                Log.i(activity.LOG_TAG, "onDescriptorWrite");
                 switch (connectionState) {
                     case STATE_ENABLE_CCCD_MEASUREMENTS:
                         if (model.bluetoothGatt.setCharacteristicNotification(model.qikMeasurementsCharacteristic, true)) {
                             BluetoothGattDescriptor cccdDescriptor = model.qikMeasurementsCharacteristic.getDescriptor(BluetoothModel.BLE_UUID_CCCD);
                             cccdDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            if (model.bluetoothGatt.writeDescriptor(cccdDescriptor)) {
-                                Log.i(activity.LOG_TAG, "Measurements CCCD enabled.");
-                            } else
-                                Log.i(activity.LOG_TAG, "Measurements CCCD failed to enable.");
+                            model.bluetoothGatt.writeDescriptor(cccdDescriptor);
                         }
                         connectionState = ConnectionStateMachine.STATE_ENABLE_CCCD_BATTERY;
                         return;
@@ -213,10 +197,7 @@ public class BluetoothGattCallbackHandler {
                         if (model.bluetoothGatt.setCharacteristicNotification(model.brobotBatteryCharacteristic, true)) {
                             BluetoothGattDescriptor cccdDescriptor = model.brobotBatteryCharacteristic.getDescriptor(BluetoothModel.BLE_UUID_CCCD);
                             cccdDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            if (model.bluetoothGatt.writeDescriptor(cccdDescriptor)) {
-                                Log.i(activity.LOG_TAG, "Battery CCCD enabled.");
-                            } else
-                                Log.i(activity.LOG_TAG, "Battery CCCD failed to enable.");
+                            model.bluetoothGatt.writeDescriptor(cccdDescriptor);
                         }
                         connectionState = ConnectionStateMachine.STATE_READ_INITIAL_CONFIG_CHAR;
                         return;
@@ -224,7 +205,6 @@ public class BluetoothGattCallbackHandler {
                         if (descriptor.getUuid().equals(BluetoothModel.BLE_UUID_CCCD)) {
                             model.bluetoothCommunicationHandler.readConfigCharacteristic();
                         }
-                        Log.i(activity.LOG_TAG, "Read init config.");
                         connectionState = ConnectionStateMachine.STATE_CONNECTION_FINNISHED;
                         return;
                     default:

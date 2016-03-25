@@ -76,6 +76,12 @@ public class MainActivity extends Activity{
         }
     }
 
+    public void setCurrentGauge(byte[] currents) {
+        Fragment fragment = fragmentManager.findFragmentByTag("MAINFRAGMENT");
+        if (fragment != null && fragment.isVisible()) {
+            ((MainFragment) fragment).setCurrentGauge(currents);
+        }
+    }
 
     public void initFragment() {
         fragmentManager = getFragmentManager();

@@ -67,8 +67,6 @@ public class SetupFragment extends Fragment implements View.OnClickListener{
         createGui(view);
         brobot = activity.getBrobot();
         updateQikConfigGuiValues();
-//        model.bluetoothCommunicationHandler.startCommunication();
-
         return view;
     }
 
@@ -110,8 +108,6 @@ public class SetupFragment extends Fragment implements View.OnClickListener{
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         serialTimeoutValue = progress;
                         txtSerialTimeoutSeekbar.setText(String.format("%02d / %02d sec", (serialTimeoutValue * 2), (skbSerialTimeout.getMax() * 2)));
-
-//                        brobot.qikMotorControl.getSerialTimeoutValuePrototype(serialTimeoutValue);
                     }
 
                     @Override
@@ -122,7 +118,6 @@ public class SetupFragment extends Fragment implements View.OnClickListener{
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
                         txtSerialTimeoutSeekbar.setText(String.format("%02d / %02d sec", (serialTimeoutValue * 2), (skbSerialTimeout.getMax() * 2)));
-//                        brobot.qikMotorControl.getSerialTimeoutValuePrototype(serialTimeoutValue);
                     }
                 }
         );
@@ -143,7 +138,6 @@ public class SetupFragment extends Fragment implements View.OnClickListener{
 
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
-
                     }
 
                     @Override
@@ -168,7 +162,6 @@ public class SetupFragment extends Fragment implements View.OnClickListener{
 
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
-
                     }
 
                     @Override

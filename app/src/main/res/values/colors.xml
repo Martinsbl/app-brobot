@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>"
+<resources>
+    <color name="brobot_black">#171717</color>
+    <color name="palette_red_lightest">#FF7572</color>
+    <color name="palette_red_light">#FF4D48</color>
+    <color name="palette_red">#FF221C</color>
+    <color name="palette_red_dark">#D50600</color>
+    <color name="palette_red_darkest">#A80400</color>
 </resources>

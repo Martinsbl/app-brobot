@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CurrentGauge">
+        <attr name="strokeColor" format="color" />
+        <attr name="strokeWidth" format="float" />
+        <attr name="startAngle" format="float" />
+        <attr name="stopAngle" format="float" />
+        <attr name="sweepAngle" format="float" />
+        <attr name="padding" format="integer" />
+        <attr name="pointEndColor" format="color" />
+        <attr name="pointStartColor" format="color" />
+        <attr name="pointSize" format="color" />
+        <attr name="startValue" format="integer" />
+        <attr name="endValue" format="integer" />
+    </declare-styleable>
+</resources>

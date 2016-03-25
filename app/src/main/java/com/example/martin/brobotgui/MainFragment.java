@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Martin on 27.02.2016.
  */
@@ -33,6 +36,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     TextView txtBatteryLevel;
     TextView txtBatteryVoltage;
 
+    CurrentGauge currentGauge0;
+    TextView txtCurrent0;
+    CurrentGauge currentGauge1;
+    TextView txtCurrent1;
+
+    Timer timerRssiUpdate;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,9 +55,25 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         brobot = activity.getBrobot();
         model.bluetoothCommunicationHandler.startCommunication();
 
+        timerRssiUpdate = new Timer();
+        timerRssiUpdate.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (model.bluetoothCurrentDevice != null) {
+                            model.bluetoothGatt.readRemoteRssi();
+                            setSignalStrengthIcon();
+                        }
+                    }
+                });
+            }
+        }, 0, 2000);
+
+
         return view;
     }
-
 
     private void createGui(View view) {
         btnConnect = (Button) view.findViewById(R.id.btn_connect);
@@ -69,6 +95,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         imgRssi.setImageResource(R.drawable.ic_battery_unknown_24dp);
         txtBatteryLevel = (TextView) view.findViewById(R.id.txt_battery_level);
         txtBatteryVoltage = (TextView) view.findViewById(R.id.txt_battery_voltage);
+
+        currentGauge0 = (CurrentGauge) view.findViewById(R.id.current_gauge_0);
+        txtCurrent0 = (TextView) view.findViewById(R.id.txt_current0);
+        currentGauge1 = (CurrentGauge) view.findViewById(R.id.current_gauge_1);
+        txtCurrent1 = (TextView) view.findViewById(R.id.txt_current1);
     }
 
     public void setSignalStrengthIcon() {
@@ -144,6 +175,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         txtBatteryVoltage.setText(String.format("%.2fV", battery_voltage));
     }
 
+    public void setCurrentGauge(byte[] currents) {
+        currentGauge0.setValue(currents[0]);
+        txtCurrent0.setText(String.format("%.02f A",currents[0]*0.150));
+        currentGauge1.setValue(currents[1]);
+        txtCurrent1.setText(String.format("%.02f A",currents[1]*0.150));
+    }
+
     public void setBrobotLayoutValuesWhenConnected() {
         btnConnect.setEnabled(false);
         btnDisconnect.setEnabled(true);
@@ -167,6 +205,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         imgBatteryLevel.setImageAlpha(0x55);
         txtBatteryVoltage.setText("--");
         txtBatteryLevel.setText("--");
+        txtCurrent0.setText("--");
+        txtCurrent1.setText("--");
+
     }
 
     @Override

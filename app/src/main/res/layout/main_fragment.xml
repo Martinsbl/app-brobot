@@ -110,7 +110,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Lower bar with terminal"
+            android:text=""
             android:textSize="40dp"
             android:gravity="center"/>
 
@@ -123,12 +123,13 @@
         android:gravity="center_horizontal">
 
         <LinearLayout
-            android:id="@+id/layout_lower_status_icons"
+            android:id="@+id/layout_rssi_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingRight="100dp">
+            android:paddingRight="@dimen/icon_padding_horizontal"
+            android:paddingLeft="@dimen/icon_padding_horizontal">
 
 
             <ImageView
@@ -150,10 +151,13 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_battery_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingRight="@dimen/icon_padding_horizontal"
+            android:paddingLeft="@dimen/icon_padding_horizontal">
 
 
             <ImageView
@@ -181,6 +185,55 @@
                 android:textSize="15dp"
                 android:gravity="center"
                 tools:text="7.23V"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_currrent_gauge0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/icon_padding_horizontal"
+            android:paddingLeft="@dimen/icon_padding_horizontal"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <com.example.martin.brobotgui.CurrentGauge
+                android:id="@+id/current_gauge_0"
+                android:layout_width="@dimen/current_gauge_width"
+                android:layout_height="@dimen/current_gauge_height"/>
+
+            <TextView
+                android:id="@+id/txt_current0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--"
+                android:textSize="@dimen/current_gauge_text_size"
+                android:gravity="center"
+                tools:text="1.37 A"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_currrent_gauge1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/icon_padding_horizontal"
+            android:paddingLeft="@dimen/icon_padding_horizontal"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <com.example.martin.brobotgui.CurrentGauge
+                android:id="@+id/current_gauge_1"
+                android:layout_width="@dimen/current_gauge_width"
+                android:layout_height="@dimen/current_gauge_height"/>
+
+            <TextView
+                android:id="@+id/txt_current1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--"
+                android:textSize="@dimen/current_gauge_text_size"
+                tools:text="1.12A"/>
 
         </LinearLayout>
 

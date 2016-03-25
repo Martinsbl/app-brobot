@@ -31,7 +31,6 @@ public class BluetoothCommunicationHandler {
         if ((model.bluetoothAdapter == null) || !model.bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, 1);
-            Toast.makeText(activity, "Bluetooth not enabled.", Toast.LENGTH_SHORT).show();
         }
 
         BluetoothGattCallbackHandler bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(activity);
@@ -57,9 +56,6 @@ public class BluetoothCommunicationHandler {
     public void readConfigCharacteristic() {
         if (model.qikConfigCharacteristic != null) {
             model.bluetoothGatt.readCharacteristic(model.qikConfigCharacteristic);
-            Log.i(activity.LOG_TAG, "Reading Qik configs.");
-        } else {
-            Log.i(activity.LOG_TAG, "Tried to read un initiated characteristic.");
         }
     }
 
