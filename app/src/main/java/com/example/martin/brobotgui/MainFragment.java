@@ -32,16 +32,18 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     MainActivity activity;
     ImageView imgRssi;
     TextView txtRssi;
+    TextView coordinates;
     ImageView imgBatteryLevel;
     TextView txtBatteryLevel;
     TextView txtBatteryVoltage;
-
+    Joystick joystick;
     CurrentGauge currentGauge0;
     TextView txtCurrent0;
     CurrentGauge currentGauge1;
     TextView txtCurrent1;
 
     Timer timerRssiUpdate;
+    Timer timerSpeedUpdate;
 
 
     @Override
@@ -71,6 +73,21 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             }
         }, 0, 2000);
 
+        timerSpeedUpdate = new Timer();
+        timerSpeedUpdate.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (brobot.qikMotorControl != null) {
+                            setBrobotSpeed(joystick.getSpeedX(), joystick.getSpeedY());
+                        }
+                    }
+                });
+            }
+        }, 0, 100);
+
 
         return view;
     }
@@ -90,6 +107,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         imgRssi = (ImageView) view.findViewById(R.id.img_rssi);
         imgRssi.setImageResource(R.drawable.ic_signal_wifi_off_24dp);
         txtRssi = (TextView) view.findViewById(R.id.txt_rssi);
+        coordinates = (TextView) view.findViewById(R.id.coordinates);
 
         imgBatteryLevel = (ImageView) view.findViewById(R.id.img_battery_level);
         imgRssi.setImageResource(R.drawable.ic_battery_unknown_24dp);
@@ -100,6 +118,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         txtCurrent0 = (TextView) view.findViewById(R.id.txt_current0);
         currentGauge1 = (CurrentGauge) view.findViewById(R.id.current_gauge_1);
         txtCurrent1 = (TextView) view.findViewById(R.id.txt_current1);
+
+        joystick = (Joystick) view.findViewById(R.id.joystick);
+        joystick.setMainFragment(this);
     }
 
     public void setSignalStrengthIcon() {
@@ -221,8 +242,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 setBrobotLayoutValuesWhenDisconnected();
                 break;
             case R.id.btn_test1:
-                brobot.qikMotorControl.setSpeed(50, 50);
-                model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
+                //brobot.qikMotorControl.setSpeed(50, 50);
+                //model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
                 break;
             case R.id.btn_test2:
                 brobot.qikMotorControl.setSpeed(0, 0);
@@ -242,4 +263,31 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             setBrobotLayoutValuesWhenDisconnected();
         }
     }
+
+    public void setBrobotSpeed(int x, int y) {
+        coordinates.setText(x + " X , " + y + " Y");
+
+        int speed0, speed1;
+        int maxSpeed = BluetoothModel.BROBOT_MAX_SPEED;
+
+            speed0 = y + x;
+            if (speed0 > maxSpeed) {
+                speed0 = maxSpeed;
+            } else if (speed0 < -maxSpeed) {
+                speed0 = -maxSpeed;
+            }
+
+            speed1 = y - x;
+            if (speed1 > maxSpeed) {
+                speed1 = maxSpeed;
+            }else if (speed1 < -maxSpeed) {
+                speed1 = -maxSpeed;
+            }
+
+        brobot.qikMotorControl.setSpeed(speed1, speed0);
+        model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
+
+    }
+
+
 }

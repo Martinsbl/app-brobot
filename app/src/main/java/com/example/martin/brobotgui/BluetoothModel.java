@@ -34,6 +34,8 @@ public class BluetoothModel {
 
     int rssi;
 
+    public static final int BROBOT_MAX_SPEED = 90;
+
     public static final UUID BLE_UUID_CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     public static final UUID BLE_UUID_QIK_CONFIG_SERVICE = UUID.fromString ("0000b0b0-1212-efde-1523-785fef13d123");
