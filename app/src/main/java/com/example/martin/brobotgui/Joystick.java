@@ -44,9 +44,13 @@ public class Joystick extends LinearLayout {
                     int x = (int) (event.getX() - (joystickWidth));
                     int y = (int) (event.getY() - (joystickHeight));
 
-                    updateSpeed(getX(x, joystickWidth), getY(y, joystickHeight));
+                    //updateSpeed(getX(x, joystickWidth), getY(y, joystickHeight));
+                    setSpeedX(getX(x, joystickWidth));
+                    setSpeedY(getY(y, joystickHeight));
                 }else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    updateSpeed(0,0);
+                    //updateSpeed(0,0);
+                    setSpeedY(0);
+                    setSpeedX(0);
                 }
                 return true;
             }
@@ -103,5 +107,13 @@ public class Joystick extends LinearLayout {
 
     public int getSpeedY() {
         return speedY;
+    }
+
+    public void setSpeedX(int speedX) {
+        this.speedX = speedX;
+    }
+
+    public void setSpeedY(int speedY) {
+        this.speedY = speedY;
     }
 }
