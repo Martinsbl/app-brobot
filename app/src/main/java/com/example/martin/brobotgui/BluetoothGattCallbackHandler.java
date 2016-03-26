@@ -173,7 +173,6 @@ public class BluetoothGattCallbackHandler {
                         }
                     });
                 }
-                //model.bluetoothGatt.readRemoteRssi();
             }
 
             @Override

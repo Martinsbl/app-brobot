@@ -270,6 +270,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         int speed0, speed1;
         int maxSpeed = BluetoothModel.BROBOT_MAX_SPEED;
 
+        if (y >= 0) {
             speed0 = y + x;
             if (speed0 > maxSpeed) {
                 speed0 = maxSpeed;
@@ -280,9 +281,24 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             speed1 = y - x;
             if (speed1 > maxSpeed) {
                 speed1 = maxSpeed;
-            }else if (speed1 < -maxSpeed) {
+            } else if (speed1 < -maxSpeed) {
                 speed1 = -maxSpeed;
             }
+        } else {
+            speed0 = y - x;
+            if (speed0 > maxSpeed) {
+                speed0 = maxSpeed;
+            } else if (speed0 < -maxSpeed) {
+                speed0 = -maxSpeed;
+            }
+
+            speed1 = y + x;
+            if (speed1 > maxSpeed) {
+                speed1 = maxSpeed;
+            } else if (speed1 < -maxSpeed) {
+                speed1 = -maxSpeed;
+            }
+        }
 
         brobot.qikMotorControl.setSpeed(speed1, speed0);
         model.bluetoothCommunicationHandler.WriteSpeedCharacteristic(brobot.qikMotorControl.getSpeed());
