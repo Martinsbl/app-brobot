@@ -143,10 +143,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
 
     public void setBatteryIcon() {
-        double battery_voltage = ((double)brobot.batteryLevel / 1024) * 1.2 * 3 *(Brobot.BATTERY_RESISTOR_HIGH + Brobot.BATTERY_RESISTOR_LOW) / Brobot.BATTERY_RESISTOR_LOW;
-        double maxBatteryLevel = 7.6;
+        double battery_voltage = ((double)brobot.batteryLevel / 1024) * 0.6 * 6 *(Brobot.BATTERY_RESISTOR_HIGH + Brobot.BATTERY_RESISTOR_LOW) / Brobot.BATTERY_RESISTOR_LOW;
+        double maxBatteryLevel = 7.7;
         double minBatteryLevel = 6.8;
         double span = maxBatteryLevel - minBatteryLevel;
+
+        txtBatteryVoltage.setText(String.format("%.2fV", battery_voltage));
+        Log.i(activity.LOG_TAG, "batt volt: " + battery_voltage);
 
 
         if (battery_voltage > maxBatteryLevel) {
@@ -177,14 +180,14 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             imgBatteryLevel.setImageResource(R.drawable.ic_battery_unknown_24dp);
         }
         txtBatteryLevel.setText(batteryPercentage + " %");
-        txtBatteryVoltage.setText(String.format("%.2fV", battery_voltage));
+        Log.i(activity.LOG_TAG, "Batt update " + brobot.batteryLevel + "  " + battery_voltage);
     }
 
     public void setCurrentGauge(byte[] currents) {
-        currentGauge0.setValue(currents[0]);
-        txtCurrent0.setText(String.format("%.02f A",currents[0]*0.150));
-        currentGauge1.setValue(currents[1]);
-        txtCurrent1.setText(String.format("%.02f A",currents[1]*0.150));
+        currentGauge0.setValue(currents[1]);
+        txtCurrent0.setText(String.format("%.02f A",currents[1]*0.150));
+        currentGauge1.setValue(currents[0]);
+        txtCurrent1.setText(String.format("%.02f A",currents[0]*0.150));
     }
 
     private void startSpeedTimer() {
