@@ -73,22 +73,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             }
         }, 0, 2000);
 
-        timerSpeedUpdate = new Timer();
-        timerSpeedUpdate.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (brobot.qikMotorControl != null) {
-                            setBrobotSpeed(joystick.getSpeedX(), joystick.getSpeedY());
-                        }
-                    }
-                });
-            }
-        }, 0, 100);
-
-
         return view;
     }
 
@@ -203,6 +187,24 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         txtCurrent1.setText(String.format("%.02f A",currents[1]*0.150));
     }
 
+    private void startSpeedTimer() {
+
+        timerSpeedUpdate = new Timer();
+        timerSpeedUpdate.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (brobot.qikMotorControl != null) {
+                            setBrobotSpeed(joystick.getSpeedX(), joystick.getSpeedY());
+                        }
+                    }
+                });
+            }
+        }, 0, 100);
+    }
+
     public void setBrobotLayoutValuesWhenConnected() {
         btnConnect.setEnabled(false);
         btnDisconnect.setEnabled(true);
@@ -212,9 +214,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         imgRssi.setImageAlpha(0xFF);
         setBatteryIcon();
         imgBatteryLevel.setImageAlpha(0xFF);
+        startSpeedTimer();
     }
 
     public void setBrobotLayoutValuesWhenDisconnected() {
+        if (timerSpeedUpdate != null) {
+            timerSpeedUpdate.cancel();
+        }
         btnConnect.setEnabled(true);
         btnDisconnect.setEnabled(false);
         imgBrobot.setImageResource(R.drawable.brobot_gray);
