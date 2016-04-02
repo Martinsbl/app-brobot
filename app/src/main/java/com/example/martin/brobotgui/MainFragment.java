@@ -83,11 +83,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         btnDisconnect.setOnClickListener(this);
         imgBrobot = (ImageView) view.findViewById(R.id.img_brobot);
 
-        btnTest1 = (Button) view.findViewById(R.id.btn_test1);
-        btnTest1.setOnClickListener(this);
-        btnTest2 = (Button) view.findViewById(R.id.btn_test2);
-        btnTest2.setOnClickListener(this);
-
         imgRssi = (ImageView) view.findViewById(R.id.img_rssi);
         imgRssi.setImageResource(R.drawable.ic_signal_wifi_off_24dp);
         txtRssi = (TextView) view.findViewById(R.id.txt_rssi);

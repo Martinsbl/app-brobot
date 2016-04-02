@@ -25,7 +25,7 @@ public class BluetoothModel {
     BluetoothGattService qikConfigService;
     BluetoothGattCharacteristic qikConfigCharacteristic;
 
-    BluetoothGattService qikMotorService;
+    BluetoothGattService qikMotorService;   
     BluetoothGattCharacteristic qikSpeedCharacteristic;
     BluetoothGattCharacteristic qikMeasurementsCharacteristic;
 

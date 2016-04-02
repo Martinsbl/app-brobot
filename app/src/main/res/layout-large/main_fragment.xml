@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,59 +11,126 @@
     android:background="#ffffff">
 
     <LinearLayout
-        android:id="@+id/connection_buttons"
-        android:layout_width="wrap_content"
+        android:id="@+id/layout_top_bar"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/gauges_group"
-        android:orientation="vertical">
+        android:gravity="center">
 
-        <Button
-            android:id="@+id/btn_connect"
-            android:layout_width="@dimen/button_width"
+        <TextView
+            android:id="@+id/text_header_brobot"
+            android:text="@string/brobot"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect"/>
+            android:textSize="@dimen/top_txt_size"/>
 
-        <Button
-            android:id="@+id/btn_disconnect"
-            android:layout_width="@dimen/button_width"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="Disconnect"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_left_button_controls"
+            android:layout_width="300dp"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/btn_connect"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect"/>
+
+            <Button
+                android:id="@+id/btn_disconnect"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Disconnect"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+
+                <com.example.martin.brobotgui.Joystick
+                    android:id="@+id/joystick"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:layout_gravity="center_horizontal"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_center_image"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_weight="2">
+
+            <ImageView
+                android:id="@+id/img_brobot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/brobot_gray"
+                android:layout_gravity="center"
+                tools:src="@drawable/brobot_red"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_right_steering_circle"
+            android:layout_width="100dp"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+
+            <Button
+                android:id="@+id/btn_test1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Test1"/>
+
+            <Button
+                android:id="@+id/btn_test2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Test2"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_lower_bar"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/coordinates"
             tools:text="X : Y"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:gravity="center"
-            android:textSize="25dp"
-            />
-
-        <ImageView
-            android:id="@+id/img_brobot"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/brobot_gray"
-            android:layout_gravity="center"
-            tools:src="@drawable/brobot_red"/>
+            android:textSize="30dp"
+            android:gravity="center"/>
 
     </LinearLayout>
 
-    <com.example.martin.brobotgui.Joystick
-        android:id="@+id/joystick"
-        android:layout_marginTop="20dp"
-        android:layout_width="230dp"
-        android:layout_height="230dp"
-        />
-
     <LinearLayout
-        android:id="@+id/gauges_group"
-        android:layout_width="170dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="right"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal">
 
         <LinearLayout
@@ -71,7 +138,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingRight="@dimen/icon_padding_horizontal"
+            android:paddingLeft="@dimen/icon_padding_horizontal">
 
 
             <ImageView
@@ -130,7 +199,7 @@
 
         </LinearLayout>
 
-            <LinearLayout
+        <LinearLayout
             android:id="@+id/layout_currrent_gauge0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -181,4 +250,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
